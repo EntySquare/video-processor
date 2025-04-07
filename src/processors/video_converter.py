@@ -76,6 +76,7 @@ class VideoConverter:
             '-i', audio_file,
             '-c:v', 'copy',
             '-c:a', 'aac',
+            '-shortest',
             '-strict', 'experimental',
             '-map', '0:v',       # 保留视频流
             '-map', '1:a',       # 保留音频流
@@ -91,7 +92,7 @@ class VideoConverter:
         # 混合音频流：视频音频和背景音乐
         filter_complex = f'[0:a][1:a]amix=inputs=2:duration=first:dropout_transition=2,volume={audio_volume}[a]'
         
-        command = ['ffmpeg', '-i', video_file, '-i', audio_file]
+        command = ['ffmpeg', '-y', '-i', video_file, '-i', audio_file]  # 添加 -y 选项，强制覆盖输出文件
         
         if start_time:
             command.extend(['-ss', start_time])
