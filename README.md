@@ -1,4 +1,3 @@
-# README.md
 
 # 视频处理工具
 
@@ -24,6 +23,18 @@ pip install -r requirements.txt
 ```
 
 ## 使用
+
+```bash
+python main.py \
+  --image-dir ./images \
+  --output final.mp4 \
+  --subtitle subtitles.srt \
+  --audio voice.mp3 \
+  --music bgm.mp3 \
+  --resolution 1080x1920 \
+  --fps 30 \
+  --music-volume 0.5
+```
 
 1. **视频转换**：
    在 `main.py` 中调用 `VideoConverter` 类的 `convert_to_vertical` 方法。
