@@ -1,5 +1,6 @@
 import argparse
 import glob
+import uuid
 from pathlib import Path
 from processors.video_converter import VideoConverter
 from processors.image_merger import ImageMerger
@@ -20,14 +21,14 @@ def parse_args():
 def main():
     args = parse_args()
     
-    # 获取所有图片
-    image_files = sorted(glob.glob(f"{args.image_dir}/*.jp*g"))
+    # 获取所有图片，包括png和其他格式
+    image_files = sorted(glob.glob(f"{args.image_dir}/*.[pjgPJG]*"))
     if not image_files:
         raise ValueError(f"目录 {args.image_dir} 中未找到图片文件")
 
     # 1. 合并图片为视频
     merger = ImageMerger()
-    temp_video = "temp_video.mp4"
+    temp_video = f"temp_video_{uuid.uuid4()}.mp4"
     merger.merge_images_to_video(
         image_paths=image_files,
         output_path=temp_video,
@@ -40,7 +41,7 @@ def main():
     # 2. 添加字幕(如果提供)
     if args.subtitle:
         subtitler = VideoSubtitler()
-        subtitle_video = "temp_subtitle.mp4"
+        subtitle_video = f"temp_subtitle_{uuid.uuid4()}.mp4"
         subtitler.burn_subtitles(
             video_path=current_video,
             subtitle_path=args.subtitle,
@@ -51,7 +52,7 @@ def main():
     # 3. 添加音频(如果提供)
     if args.audio:
         converter = VideoConverter()
-        audio_video = "temp_audio.mp4"
+        audio_video = f"temp_audio_{uuid.uuid4()}.mp4"
         converter.merge_audio_video(
             video_file=current_video,
             audio_file=args.audio,
@@ -73,7 +74,7 @@ def main():
         Path(current_video).rename(args.output)
 
     # 清理临时文件
-    for temp_file in ["temp_video.mp4", "temp_subtitle.mp4", "temp_audio.mp4"]:
+    for temp_file in [temp_video, subtitle_video, audio_video]:
         if Path(temp_file).exists():
             Path(temp_file).unlink()
 
