@@ -32,31 +32,31 @@ def main():
     )
     
     # 示例3: 使用通配符获取所有图片
-    all_images = sorted(glob.glob("images/*.jpg"))
+    all_images = sorted(glob.glob("images/*.jpeg"))
     merger.merge_images_to_video(
         image_paths=all_images,
         output_path="output3.mp4"
     )
 
-    converter = VideoConverter()
+    # converter = VideoConverter()
 
-    # 转换视频并添加背景音乐
-    converter.convert_to_vertical(
-        input_file="input.mp4",
-        output_file="output.mp4",
-        audio_file="background.mp3",
-        audio_volume=0.5  # 设置音量为原来的50%
-    )
+    # # 转换视频并添加背景音乐
+    # converter.convert_to_vertical(
+    #     input_file="input.mp4",
+    #     output_file="output.mp4",
+    #     audio_file="background.mp3",
+    #     audio_volume=0.5  # 设置音量为原来的50%
+    # )
 
-    # 单独为视频添加背景音乐
-    converter.add_audio_to_video(
-        video_file="input.mp4",
-        audio_file="music.mp3",
-        output_file="output_with_music.mp4",
-        audio_volume=0.7,
-        start_time="00:00:10",  # 从10秒开始
-        duration="00:01:00"     # 持续1分钟
-    )
+    # # 单独为视频添加背景音乐
+    # converter.add_audio_to_video(
+    #     video_file="input.mp4",
+    #     audio_file="music.mp3",
+    #     output_file="output_with_music.mp4",
+    #     audio_volume=0.7,
+    #     start_time="00:00:10",  # 从10秒开始
+    #     duration="00:01:00"     # 持续1分钟
+    # )
 
 if __name__ == "__main__":
     main()
