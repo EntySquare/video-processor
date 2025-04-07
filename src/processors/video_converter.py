@@ -55,11 +55,41 @@ class VideoConverter:
             ]
         self.run_ffmpeg_command(command)
 
-    def add_audio_to_video(self, video_file: str, audio_file: str, output_file: str, 
-                          audio_volume: float = 1.0, start_time: Optional[str] = None, 
-                          duration: Optional[str] = None):
+    def merge_audio_video(self, video_file: str, audio_file: str, output_file: str):
+        """
+        合并独立的音频和视频文件
+        
+        Args:
+            video_file: 视频文件路径
+            audio_file: 音频文件路径
+            output_file: 输出文件路径
+        """
+        # 验证文件存在
+        for file in [video_file, audio_file]:
+            if not os.path.exists(file):
+                raise FileNotFoundError(f"文件不存在: {file}")
+        
+        # 合并音频和视频
+        command = [
+            'ffmpeg',
+            '-i', video_file,
+            '-i', audio_file,
+            '-c:v', 'copy',
+            '-c:a', 'aac',
+            '-strict', 'experimental',
+            '-map', '0:v',       # 保留视频流
+            '-map', '1:a',       # 保留音频流
+            output_file
+        ]
+        
+        self.run_ffmpeg_command(command)
+
+    def add_background_music(self, video_file: str, audio_file: str, output_file: str, 
+                            audio_volume: float = 1.0, start_time: Optional[str] = None, 
+                            duration: Optional[str] = None):
         """为视频添加背景音乐，可控制音量和时长"""
-        filter_complex = f'[1:a]volume={audio_volume}[a]'
+        # 混合音频流：视频音频和背景音乐
+        filter_complex = f'[0:a][1:a]amix=inputs=2:duration=first:dropout_transition=2,volume={audio_volume}[a]'
         
         command = ['ffmpeg', '-i', video_file, '-i', audio_file]
         
@@ -67,11 +97,12 @@ class VideoConverter:
             command.extend(['-ss', start_time])
         if duration:
             command.extend(['-t', duration])
-            
+        
+        # 将背景音乐和原始音频流混合
         command.extend([
             '-filter_complex', filter_complex,
-            '-map', '0:v',
-            '-map', '[a]',
+            '-map', '0:v',         # 保留视频流
+            '-map', '[a]',         # 混合后的音频流
             '-shortest',
             '-c:v', 'copy',
             '-c:a', 'aac',
@@ -79,6 +110,7 @@ class VideoConverter:
         ])
         
         self.run_ffmpeg_command(command)
+
 
     def run_ffmpeg_command(self, command):
         try:

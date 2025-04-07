@@ -15,6 +15,11 @@
 请确保你已经安装了 `ffmpeg`。你可以通过以下命令安装所需的 Python 库：
 
 ```bash
+
+# 安装中文字体
+sudo apt update
+sudo apt install fonts-noto-cjk
+
 pip install -r requirements.txt
 ```
 
