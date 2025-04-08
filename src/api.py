@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
+from datetime import datetime
 from fastapi.staticfiles import StaticFiles
 import mimetypes
 import uuid
@@ -63,15 +64,27 @@ async def process_video_api(
         music_volume=music_volume
     )
     
-    # 返回文件下载响应
-    return FileResponse(
-        path=output_path,
-        media_type="video/mp4",
-        filename=f"video_{session_id}.mp4",
-        headers={
-            "Content-Disposition": f"inline; filename=video_{session_id}.mp4"
+    # 获取文件信息
+    file_stat = Path(output_path).stat()
+    
+    response_data = {
+        "status": "success",
+        "video_id": session_id,
+        "metadata": {
+            "filename": f"video_{session_id}.mp4",
+            "file_size": file_stat.st_size,
+            "created_at": datetime.fromtimestamp(file_stat.st_ctime).isoformat(),
+            "resolution": resolution,
+            "fps": fps
+        },
+        "urls": {
+            "download": f"/outputs/{session_id}.mp4",
+            "preview": f"/preview/{session_id}",
+            "stream": f"/stream/{session_id}"
         }
-    )
+    }
+    
+    return JSONResponse(content=response_data)
     
 @app.get("/preview/{video_id}")
 async def preview_video(video_id: str):
@@ -79,10 +92,12 @@ async def preview_video(video_id: str):
     if not video_path.exists():
         raise HTTPException(status_code=404, detail="视频不存在")
         
+    # 返回文件下载响应
     return FileResponse(
-        path=video_path,
+        path=output_path,
         media_type="video/mp4",
+        filename=f"video_{session_id}.mp4",
         headers={
-            "Content-Disposition": "inline"
+            "Content-Disposition": f"inline; filename=video_{session_id}.mp4"
         }
     )
