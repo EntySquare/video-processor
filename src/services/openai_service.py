@@ -58,7 +58,7 @@ class OpenAIService:
         srt = ""
         
         current_time = 0
-        duration = 3  # 每条字幕显示3秒
+        duration = 2  # 每条字幕显示2秒
         
         for i, line in enumerate(lines, 1):
             if line.strip():
