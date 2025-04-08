@@ -76,7 +76,7 @@ class VideoConverter:
             '-i', audio_file,
             '-c:v', 'copy',
             '-c:a', 'aac',
-            '-shortest',
+            #'-shortest',
             '-strict', 'experimental',
             '-map', '0:v',       # 保留视频流
             '-map', '1:a',       # 保留音频流
