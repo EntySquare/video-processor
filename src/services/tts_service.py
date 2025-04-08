@@ -10,7 +10,7 @@ class TTSService:
         
         # 获取OpenAI配置
         api_key = os.getenv('OPENAI_API_KEY')
-        base_url = os.getenv('OPENAI_API_BASE', 'https://api.openai.com/v1')
+        base_url = os.getenv('OPENAI_API_AUDIO_BASE', 'https://api.openai.com/v1')
         
         if not api_key:
             raise ValueError("未找到OPENAI_API_KEY环境变量")
