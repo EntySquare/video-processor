@@ -94,7 +94,7 @@ async def preview_video(video_id: str):
         
     # 返回文件下载响应
     return FileResponse(
-        path=output_path,
+        path=video_path,
         media_type="video/mp4",
         filename=f"video_{session_id}.mp4",
         headers={
