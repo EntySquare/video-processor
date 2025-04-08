@@ -9,7 +9,18 @@ class OpenAIService:
     def __init__(self):
         # 加载环境变量
         load_dotenv()
-        self.client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        # 获取配置
+        api_key = os.getenv('OPENAI_API_KEY')
+        base_url = os.getenv('OPENAI_API_BASE', 'https://api.openai.com/v1')
+        
+        if not api_key:
+            raise ValueError("未找到OPENAI_API_KEY环境变量")
+            
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url=base_url
+        )
+        # 加载Whisper模型
         try:
             self.whisper_model = whisper.load_model("base")
         except Exception as e:
