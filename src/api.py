@@ -20,7 +20,7 @@ OUTPUT_DIR = "outputs"
 # 挂载静态文件目录
 app.mount("/outputs", StaticFiles(directory="outputs"), name="outputs")
 
-@app.post("/generate_video")
+@app.post("/v1/generate_video")
 async def process_video_api(
     images: list[UploadFile] = File(...),
     prompt: str = Form(None),
@@ -86,7 +86,7 @@ async def process_video_api(
     
     return JSONResponse(content=response_data)
     
-@app.get("/preview/{video_id}")
+@app.get("/v1/preview/{video_id}")
 async def preview_video(video_id: str):
     video_path = Path(OUTPUT_DIR) / f"{video_id}.mp4"
     if not video_path.exists():
