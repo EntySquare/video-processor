@@ -2,6 +2,7 @@ fastapi
 python-multipart
 openai
 openai-whisper
+langid
 edge-tts
 python-dotenv
 uvicorn
