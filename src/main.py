@@ -28,6 +28,11 @@ def process_video(
     resolution: str = "1080x1920",
     music_volume: float = 0.5
 ):
+    
+    # 确保输出目录存在
+    output_dir = Path(output_path).parent
+    output_dir.mkdir(parents=True, exist_ok=True)
+
     # 获取所有图片
     image_files = sorted(glob.glob(f"{image_dir}/*.[pjgPJG]*"))
     if not image_files:
@@ -77,8 +82,9 @@ def process_video(
             audio_volume=music_volume
         )
     else:
-        # 如果没有背景音乐，重命名最后的临时文件
-        Path(current_video).rename(output_path)
+        # 复制而不是重命名，以避免跨设备移动问题
+        import shutil
+        shutil.copy2(str(current_video), output_path)
 
     # 清理临时文件
     for temp_file in [temp_video, subtitle_video, audio_video]:
