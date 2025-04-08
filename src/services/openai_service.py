@@ -3,6 +3,7 @@ import whisper
 from pathlib import Path
 import os
 from typing import Optional
+from dotenv import load_dotenv
 
 class OpenAIService:
     def __init__(self):
