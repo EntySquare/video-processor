@@ -1,8 +1,9 @@
 fastapi
 python-multipart
 openai
-whisper
+openai-whisper
 edge-tts
+python-dotenv
 uvicorn
 ffmpeg-python
 opencv-python
