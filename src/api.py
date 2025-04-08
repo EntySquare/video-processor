@@ -1,5 +1,7 @@
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+import mimetypes
 import uuid
 import os
 from pathlib import Path
@@ -13,6 +15,9 @@ tts_service = TTSService()
 
 UPLOAD_DIR = "uploads"
 OUTPUT_DIR = "outputs"
+
+# 挂载静态文件目录
+app.mount("/outputs", StaticFiles(directory="outputs"), name="outputs")
 
 @app.post("/generate_video")
 async def process_video_api(
@@ -58,4 +63,26 @@ async def process_video_api(
         music_volume=music_volume
     )
     
-    return FileResponse(output_path)
+    # 返回文件下载响应
+    return FileResponse(
+        path=output_path,
+        media_type="video/mp4",
+        filename=f"video_{session_id}.mp4",
+        headers={
+            "Content-Disposition": f"inline; filename=video_{session_id}.mp4"
+        }
+    )
+    
+@app.get("/preview/{video_id}")
+async def preview_video(video_id: str):
+    video_path = Path(OUTPUT_DIR) / f"{video_id}.mp4"
+    if not video_path.exists():
+        raise HTTPException(status_code=404, detail="视频不存在")
+        
+    return FileResponse(
+        path=video_path,
+        media_type="video/mp4",
+        headers={
+            "Content-Disposition": "inline"
+        }
+    )
