@@ -22,17 +22,26 @@ app.mount("/outputs", StaticFiles(directory="outputs"), name="outputs")
 
 @app.post("/v1/generate_video")
 async def process_video_api(
-    images: list[UploadFile] = File(...),
-    prompt: str = Form(None),
-    fps: int = Form(30),
-    resolution: str = Form("1080x1920"),
-    music_volume: float = Form(0.5)
+    images: list[UploadFile] = File(..., description="图片文件列表"),
+    prompt: str = Form(None, description="提示文本，用于生成字幕和语音"),
+    bgm: UploadFile = File(None, description="背景音乐文件"),
+    fps: int = Form(30, description="视频帧率"),
+    resolution: str = Form("1080x1920", description="视频分辨率"),
+    music_volume: float = Form(0.5, description="背景音乐音量"),
 ):
     # 创建临时目录
     session_id = str(uuid.uuid4())
     image_dir = Path(UPLOAD_DIR) / session_id / "images"
     image_dir.mkdir(parents=True, exist_ok=True)
-    
+
+    temp_dir = Path(UPLOAD_DIR) / session_id
+    # 如果提供了背景音乐，保存文件
+    bgm_path = None
+    if bgm:
+        bgm_path = temp_dir / f"bgm{Path(bgm.filename).suffix}"
+        content = await bgm.read()
+        bgm_path.write_bytes(content)
+
     # 保存上传的图片
     image_paths = []
     for img in images:
@@ -59,6 +68,7 @@ async def process_video_api(
         output_path=str(output_path),
         subtitle_path=str(subtitle_path) if prompt else None,
         audio_path=str(audio_path) if prompt else None,
+        music_path=str(bgm_path) if bgm else None,
         fps=fps,
         resolution=resolution,
         music_volume=music_volume
@@ -86,18 +96,35 @@ async def process_video_api(
     
     return JSONResponse(content=response_data)
     
+@app.get("/v1/download/{video_id}")
+async def download_video(video_id: str):
+    video_path = Path(OUTPUT_DIR) / f"{video_id}.mp4"
+    if not video_path.exists():
+        raise HTTPException(status_code=404, detail="视频不存在")
+        
+    return FileResponse(
+        path=str(video_path),
+        media_type="video/mp4",
+        filename=f"video_{video_id}.mp4",
+        headers={
+            "Content-Disposition": f"attachment; filename=video_{video_id}.mp4",
+            "Content-Type": "video/mp4"
+        }
+    )
+    
 @app.get("/v1/preview/{video_id}")
 async def preview_video(video_id: str):
     video_path = Path(OUTPUT_DIR) / f"{video_id}.mp4"
     if not video_path.exists():
         raise HTTPException(status_code=404, detail="视频不存在")
         
-    # 返回文件下载响应
     return FileResponse(
         path=str(video_path),
         media_type="video/mp4",
         filename=f"video_{video_id}.mp4",
         headers={
-            "Content-Disposition": f"inline; filename=video_{video_id}.mp4"
+            "Content-Disposition": f"inline; filename=video_{video_id}.mp4",
+            "Content-Type": "video/mp4",
+            "Accept-Ranges": "bytes"
         }
     )
