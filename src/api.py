@@ -43,7 +43,8 @@ async def process_video_api(
         
         # TTS生成音频
         audio_path = Path(UPLOAD_DIR) / session_id / "audio.mp3"
-        await tts_service.generate_audio(prompt, str(audio_path))
+        success = await tts_service.generate_audio(prompt, str(audio_path))
+        print(f"音频生成{'成功' if success else '失败'}")
     
     # 处理视频
     output_path = Path(OUTPUT_DIR) / f"{session_id}.mp4"
