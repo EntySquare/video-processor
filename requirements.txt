@@ -1,3 +1,9 @@
+fastapi
+python-multipart
+openai
+whisper
+edge-tts
+uvicorn
 ffmpeg-python
 opencv-python
 numpy
