@@ -35,6 +35,7 @@ python main.py \
   --fps 30 \
   --music-volume 0.5
 ```
+# 生成
 curl -X POST "https://audio.enty.services/v1/generate_video" \
   -F "images=@/Users/es/video-processor/src/images/img001.png" \
   -F "images=@/Users/es/video-processor/src/images/img002.png" \
@@ -49,7 +50,12 @@ curl -X POST "https://audio.enty.services/v1/generate_video" \
   -F "music_volume=0.5"
 
 
-  curl -# -o downloaded_video.mp4 https:/audio.enty.services/v1/download/{video_id}
+## 下载
+curl -# -o downloaded_video.mp4 https:/audio.enty.services/v1/download/{video_id}
+
+
+## 预览
+https://audio.enty.services/v1/preview/d2155aae-b744-4287-a96a-7d52e7d241b7
 
 ```json
 
