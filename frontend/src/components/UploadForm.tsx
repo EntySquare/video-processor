@@ -17,6 +17,11 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!images.length) {
+      setError('请选择至少一张图片');
+      return;
+    }
+
     const formData = new FormData();
     
     // 添加图片文件
@@ -43,11 +48,16 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
       const response = await fetch('https://audio.enty.services/v1/generate_video', {
         method: 'POST',
         body: formData,
-        // 设置超时
-        signal: AbortSignal.timeout(60000)
+        headers: {
+          'Accept': 'application/json',
+        },
+        signal: AbortSignal.timeout(300000) // 5分钟超时
       });
       
-      if (!response.ok) throw new Error('上传失败');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `上传失败 (${response.status})`);
+      }
       
       const data = await response.json();
       console.group('视频生成响应');
@@ -59,6 +69,7 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
       console.groupEnd();
       onUploadSuccess(data.video_id);
     } catch (err) {
+      console.error('上传错误:', err);
       setError(err instanceof Error ? err.message : '上传出错');
     } finally {
       setUploading(false);
@@ -75,18 +86,21 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
             multiple
             accept="image/*"
             onChange={handleImageChange}
-            required
             className="mt-1 block w-full"
           />
+          {images.length > 0 && (
+            <span className="text-sm text-gray-500">
+              已选择 {images.length} 张图片
+            </span>
+          )}
         </label>
         
         <label className="block">
-          <span className="text-gray-700">背景音乐</span>
+          <span className="text-gray-700">背景音乐（可选）</span>
           <input
             type="file"
             name="bgm"
             accept="audio/*"
-            required
             className="mt-1 block w-full"
           />
         </label>
@@ -95,28 +109,30 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
           <span className="text-gray-700">文案提示</span>
           <textarea
             ref={promptRef}
-            required
             rows={4}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            placeholder="请输入文案提示..."
           />
         </label>
       </div>
 
-      {error && <p className="text-red-500">{error}</p>}
-      <div className="flex items-center space-x-2">
-        <button
-          type="submit"
-          disabled={uploading || images.length === 0}
-          className="bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-400"
-        >
-          {uploading ? '生成中...' : '开始生成'}
-        </button>
-        {images.length > 0 && (
-          <span className="text-sm text-gray-600">
-            已选择 {images.length} 张图片
-          </span>
-        )}
-      </div>
+      {error && (
+        <div className="bg-red-50 text-red-500 p-4 rounded">
+          {error}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={uploading || images.length === 0}
+        className={`w-full py-2 px-4 rounded transition-colors ${
+          uploading || images.length === 0
+            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            : 'bg-blue-600 hover:bg-blue-700 text-white'
+        }`}
+      >
+        {uploading ? '处理中...' : '开始生成'}
+      </button>
     </form>
   );
 }
