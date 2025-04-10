@@ -43,6 +43,8 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
       const response = await fetch('https://audio.enty.services/v1/generate_video', {
         method: 'POST',
         body: formData,
+        // 设置超时
+        signal: AbortSignal.timeout(30000)
       });
       
       if (!response.ok) throw new Error('上传失败');
