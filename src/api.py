@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 from fastapi.staticfiles import StaticFiles
 import mimetypes
@@ -11,6 +12,13 @@ from services.tts_service import TTSService
 from main import process_video
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 允许的源
+    allow_credentials=True,
+    allow_methods=["*"],  # 允许所有方法
+    allow_headers=["*"],  # 允许所有头部
+)
 openai_service = OpenAIService()
 tts_service = TTSService()
 

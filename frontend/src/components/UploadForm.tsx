@@ -44,12 +44,19 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
         method: 'POST',
         body: formData,
         // 设置超时
-        signal: AbortSignal.timeout(30000)
+        signal: AbortSignal.timeout(60000)
       });
       
       if (!response.ok) throw new Error('上传失败');
       
       const data = await response.json();
+      console.group('视频生成响应');
+      console.log('状态码:', response.status);
+      console.log('响应数据:', data);
+      console.log('视频ID:', data.video_id);
+      console.log('元数据:', data.metadata);
+      console.log('链接:', data.urls);
+      console.groupEnd();
       onUploadSuccess(data.video_id);
     } catch (err) {
       setError(err instanceof Error ? err.message : '上传出错');
