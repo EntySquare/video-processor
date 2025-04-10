@@ -25,7 +25,8 @@ module.exports = {
       exec_mode: "fork",
       env: {
         NODE_ENV: "production",
-        PORT: 5000
+        PORT: 5000,
+        HOST: "0.0.0.0"  // 允许外网访问
       },
       log_date_format: "YYYY-MM-DD HH:mm:ss",
       error_file: "./logs/frontend-err.log",
