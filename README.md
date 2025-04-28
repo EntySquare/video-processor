@@ -36,6 +36,7 @@ python main.py \
   --music-volume 0.5
 ```
 # 生成
+## 图生视频( ppt)
 curl -X POST "https://audio.enty.services/v1/generate_video" \
   -F "images=@/Users/es/video-processor/src/images/img001.png" \
   -F "images=@/Users/es/video-processor/src/images/img002.png" \
@@ -49,6 +50,15 @@ curl -X POST "https://audio.enty.services/v1/generate_video" \
   -F "resolution=1080x1920" \
   -F "music_volume=0.5"
 
+
+## 数字人
+curl -X POST "https://audio.enty.services/v1/generate_video" \
+  -F "video=@/Users/es/video-processor/src/videos/mask.mp4" \
+  -F "prompt=在这个快节奏的时代，我们深知您对品质生活的追求。我们始终坚持以创新为驱动，以品质为核心，为您提供卓越的产品和服务。我们的产品，不仅是功能性的体现，更是情感的寄托，是您美好生活的见证。 我们精选优质材料，采用先进工艺，力求每一个细节都精益求精。我们的服务，始终以客户为中心，用心倾听，耐心解答，为您提供全方位、个性化的解决方案。选择我们，就是选择品质，选择放心，选择美好的未来。我们期待与您携手，共创美好生活的新篇章。" \
+  -F "bgm=@/Users/es/video-processor/src/bgm.mp3" \
+  -F "fps=30" \
+  -F "resolution=1080x1920" \
+  -F "music_volume=0.5"
 
 ## 下载
 curl -# -o downloaded_video.mp4 https:/audio.enty.services/v1/download/{video_id}
