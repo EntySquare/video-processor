@@ -19,8 +19,9 @@ def parse_args():
     return parser.parse_args()
 
 def process_video(
-    image_dir: str,
-    output_path: str,
+    image_dir: str = None,  # 如果没有视频目录，可以使用图片目录
+    video_dir: str = None,  # 支持视频目录
+    output_path: str = None,
     subtitle_path: str = None,
     audio_path: str = None,
     music_path: str = None,
@@ -33,22 +34,33 @@ def process_video(
     output_dir = Path(output_path).parent
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # 获取所有图片
-    image_files = sorted(glob.glob(f"{image_dir}/*.[pjgPJG]*"))
-    if not image_files:
-        raise ValueError(f"目录 {image_dir} 中未找到图片文件")
+    current_video = None
 
-    # 1. 合并图片为视频
-    merger = ImageMerger()
-    temp_video = f"temp_video_{uuid.uuid4()}.mp4"
-    merger.merge_images_to_video(
-        image_paths=image_files,
-        output_path=temp_video,
-        frame_rate=fps,
-        resolution=resolution
-    )
+    # 如果提供了视频目录，处理视频文件
+    if video_dir:
+        video_files = sorted(glob.glob(f"{video_dir}/*.mp4"))
+        if not video_files:
+            raise ValueError(f"目录 {video_dir} 中未找到视频文件")
+        
+        # 如果是视频目录，直接使用第一个视频文件
+        current_video = video_files[0]
     
-    current_video = temp_video
+    # 如果没有视频文件，使用图片目录合成视频
+    if not current_video and image_dir:
+        image_files = sorted(glob.glob(f"{image_dir}/*.[pjgPJG]*"))
+        if not image_files:
+            raise ValueError(f"目录 {image_dir} 中未找到图片文件")
+
+        # 1. 合并图片为视频
+        merger = ImageMerger()
+        temp_video = f"temp_video_{uuid.uuid4()}.mp4"
+        merger.merge_images_to_video(
+            image_paths=image_files,
+            output_path=temp_video,
+            frame_rate=fps,
+            resolution=resolution
+        )
+        current_video = temp_video
     
     # 2. 添加字幕(如果提供)
     if subtitle_path:
