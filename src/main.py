@@ -8,7 +8,8 @@ from processors.srt import VideoSubtitler
 
 def parse_args():
     parser = argparse.ArgumentParser(description='视频处理工具')
-    parser.add_argument('--image-dir', type=str, required=True, help='图片目录路径')
+    parser.add_argument('--image-dir', type=str, default=None, help='图片目录路径')
+    parser.add_argument('--image-dir', type=str, default=None, help='视频目录路径')
     parser.add_argument('--output', type=str, default='output.mp4', help='输出视频路径')
     parser.add_argument('--subtitle', type=str, help='字幕文件路径(.srt)')
     parser.add_argument('--audio', type=str, help='音频文件路径')
@@ -29,12 +30,14 @@ def process_video(
     resolution: str = "1080x1920",
     music_volume: float = 0.5
 ):
-    
     # 确保输出目录存在
     output_dir = Path(output_path).parent
     output_dir.mkdir(parents=True, exist_ok=True)
 
     current_video = None
+    temp_video = None
+    subtitle_video = None
+    audio_video = None
 
     # 如果提供了视频目录，处理视频文件
     if video_dir:
@@ -100,13 +103,14 @@ def process_video(
 
     # 清理临时文件
     for temp_file in [temp_video, subtitle_video, audio_video]:
-        if Path(temp_file).exists():
+        if temp_file and Path(temp_file).exists():
             Path(temp_file).unlink()
 
 def main():
     args = parse_args()
     process_video(
         image_dir=args.image_dir,
+        video_dir=args.video_dir,
         output_path=args.output,
         subtitle_path=args.subtitle,
         audio_path=args.audio,
