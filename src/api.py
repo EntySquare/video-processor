@@ -47,12 +47,12 @@ async def process_video_api(
     temp_dir = Path(UPLOAD_DIR) / session_id
     temp_dir.mkdir(parents=True, exist_ok=True)
 
-    video_path = None
+    video_dir = None
     if video:
         video_path = temp_dir / video.filename
-        video_path.mkdir(parents=True, exist_ok=True)
         content = await video.read()
         video_path.write_bytes(content)
+        video_dir = video_path.parent  # 获取视频文件所在的目录
 
     image_dir = None
     if images:
@@ -89,7 +89,7 @@ async def process_video_api(
     output_path = Path(OUTPUT_DIR) / f"{session_id}.mp4"
     process_video(
         image_dir=str(image_dir) if image_dir else None,
-        video_dir=str(video_path) if video_path else None,
+        video_dir=str(video_dir) if video_dir else None,
         output_path=str(output_path),
         subtitle_path=str(subtitle_path) if subtitle_path else None,
         audio_path=str(audio_path) if audio_path else None,
