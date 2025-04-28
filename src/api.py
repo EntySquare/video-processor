@@ -50,6 +50,7 @@ async def process_video_api(
     video_path = None
     if video:
         video_path = temp_dir / video.filename
+        video_path.mkdir(parents=True, exist_ok=True)
         content = await video.read()
         video_path.write_bytes(content)
 
