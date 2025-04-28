@@ -88,7 +88,7 @@ async def process_video_api(
     output_path = Path(OUTPUT_DIR) / f"{session_id}.mp4"
     process_video(
         image_dir=str(image_dir) if image_dir else None,
-        video_path=str(video_path) if video_path else None,
+        video_dir=str(video_path) if video_path else None,
         output_path=str(output_path),
         subtitle_path=str(subtitle_path) if subtitle_path else None,
         audio_path=str(audio_path) if audio_path else None,
